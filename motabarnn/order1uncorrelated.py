@@ -9,7 +9,7 @@ class Order1Uncorrelated(nn.Module):
   chi: torch.Tensor
   """shape: (in_features, hidden_size, 1) anchor inputs (shared across out_features)"""
   sigma_eps: torch.Tensor
-  """shape: (hidden_size, out_features) measurement error stddev"""
+  """shape: (hidden_size, out_features) measurement error stddev (possibly shared across anchor inputs)"""
   eta: torch.Tensor
   """shape: (hidden_size, out_features) anchor outputs"""
   mu_phi: torch.Tensor
@@ -18,13 +18,14 @@ class Order1Uncorrelated(nn.Module):
   """shape: (out_features,) prior stddevs of f(input)"""
 
 
-  def __init__(self, in_features, out_features=1, hidden_size=128, share_sigma_psi=False):
+  def __init__(self, in_features, out_features=1, 
+               hidden_size=128, share_sigma_psi=False, share_eps=False):
     super().__init__()
 
     # parameters:
     self.sigma_psi = nn.Parameter(torch.randn(in_features, 1 if share_sigma_psi else hidden_size, out_features))
     self.chi = nn.Parameter(torch.randn(in_features, hidden_size, 1))
-    self.sigma_eps = nn.Parameter(torch.randn(hidden_size, out_features))
+    self.sigma_eps = nn.Parameter(torch.randn(1 if share_eps else hidden_size, out_features))
     self.eta = nn.Parameter(torch.randn(hidden_size, out_features))
     self.mu_phi = nn.Parameter(torch.randn(out_features))
     self.sigma_phi = nn.Parameter(torch.randn(out_features))
