@@ -23,19 +23,21 @@ class Order1Uncorrelated(nn.Module):
     super().__init__()
 
     # parameters:
-    self.sigma_psi = nn.Parameter(torch.randn(in_features, 1 if share_sigma_psi else hidden_size, out_features))
-    self.chi = nn.Parameter(torch.randn(in_features, hidden_size, 1))
-    self.sigma_eps = nn.Parameter(torch.randn(1 if share_eps else hidden_size, out_features))
-    self.eta = nn.Parameter(torch.randn(hidden_size, out_features))
-    self.mu_phi = nn.Parameter(torch.randn(out_features))
-    self.sigma_phi = nn.Parameter(torch.randn(out_features))
+    self.in_features = in_features
+    self.sigma_psi = nn.Parameter(torch.randn(1, in_features, 1 if share_sigma_psi else hidden_size, out_features))
+    self.chi = nn.Parameter(torch.randn(1, in_features, hidden_size, 1))
+    self.sigma_eps = nn.Parameter(torch.randn(1, 1 if share_eps else hidden_size, out_features))
+    self.eta = nn.Parameter(torch.randn(1, hidden_size, out_features))
+    self.mu_phi = nn.Parameter(torch.randn(1, out_features))
+    self.sigma_phi = nn.Parameter(torch.randn(1, out_features))
 
 
   def forward(self, input):
     # see paper for details
-    s = ((self.sigma_psi * (self.chi - input.reshape(-1, 1, 1)))**2).sum(axis=0)  # shape: (hidden_size, out_features)
-    w = 1 / (s + self.sigma_eps**2)  # shape: (hidden_size, out_features)
-    denominator = 1 + self.sigma_phi**2 * w.sum()  # shape: (out_features,)
-    posterior_mu_phi = self.mu_phi + self.sigma_phi**2 * (w * self.eta).sum(axis=0) / denominator  # shape: (out_features,)
-    posterior_sigma2_phi = self.sigma_phi**2 / denominator  # shape: (out_features,)
+    s = ((self.sigma_psi * (self.chi - input.reshape(-1, self.in_features, 1, 1)))**2).sum(axis=1)  # shape: (-1, hidden_size, out_features)
+    w = 1 / (s + self.sigma_eps**2)  # shape: (-1, hidden_size, out_features)
+    denominator = 1 + self.sigma_phi**2 * w.sum(axis=1)  # shape: (-1, out_features)
+    posterior_mu_phi = (self.mu_phi + self.sigma_phi**2 * (w * self.eta).sum(axis=1)) / denominator  # shape: (-1, out_features)
+    posterior_sigma2_phi = self.sigma_phi**2 / denominator  # shape: (-1, out_features)
+#     print("shapes:", input.shape, s.shape, w.shape, denominator.shape, posterior_mu_phi.shape, posterior_sigma2_phi.shape)
     return posterior_mu_phi, posterior_sigma2_phi
