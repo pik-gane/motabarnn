@@ -34,7 +34,7 @@ class Order1Uncorrelated(nn.Module):
     # see paper for details
     s = ((self.sigma_psi * (self.chi - input.reshape(-1, 1, 1)))**2).sum(axis=0)  # shape: (hidden_size, out_features)
     w = 1 / (s + self.sigma_eps**2)  # shape: (hidden_size, out_features)
-    normalizer = 1 + self.sigma_phi**2 * w.sum()  # shape: (out_features,)
-    posterior_mu_phi = self.mu_phi + self.sigma_phi**2 * (w * self.eta).sum(axis=0) / normalizer  # shape: (out_features,)
-    posterior_sigma2_phi = self.sigma_phi**2 / normalizer  # shape: (out_features,)
+    denominator = 1 + self.sigma_phi**2 * w.sum()  # shape: (out_features,)
+    posterior_mu_phi = self.mu_phi + self.sigma_phi**2 * (w * self.eta).sum(axis=0) / denominator  # shape: (out_features,)
+    posterior_sigma2_phi = self.sigma_phi**2 / denominator  # shape: (out_features,)
     return posterior_mu_phi, posterior_sigma2_phi
