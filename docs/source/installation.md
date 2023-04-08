@@ -1,23 +1,23 @@
 Installation
 ============
 
-**my-package** supports Python >= 3.8.
+**motabarnn** supports Python >= 3.8.
 
 ## Installing with `pip`
 
-**my-package** is available [on PyPI](https://pypi.org/project/my-package/). Just run
+**motabarnn** is available [on PyPI](https://pypi.org/project/motabarnn/). Just run
 
 ```bash
-pip install my-package
+pip install motabarnn
 ```
 
 ## Installing from source
 
-To install **my-package** from source, first clone [the repository](https://github.com/allenai/python-package-template):
+To install **motabarnn** from source, first clone [the repository](https://github.com/pik-gane/motabarnn):
 
 ```bash
-git clone https://github.com/allenai/python-package-template.git
-cd python-package-template
+git clone https://github.com/pik-gane/motabarnn.git
+cd motabarnn
 ```
 
 Then run
