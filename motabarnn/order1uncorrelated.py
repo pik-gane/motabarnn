@@ -5,7 +5,7 @@ class Order1Uncorrelated(nn.Module):
 
   # parameters:
   sigma_psi: torch.Tensor
-  """shape: (in_features, hidden_size, out_features) prior stddev of f' """
+  """shape: (in_features, hidden_size or 1, out_features) prior stddev of f' (possibly shared across anchor inputs)"""
   chi: torch.Tensor
   """shape: (in_features, hidden_size, 1) anchor inputs (shared across out_features)"""
   sigma_eps: torch.Tensor
@@ -18,11 +18,11 @@ class Order1Uncorrelated(nn.Module):
   """shape: (out_features,) prior stddevs of f(input)"""
 
 
-  def __init__(self, in_features, out_features=1, hidden_size=128):
+  def __init__(self, in_features, out_features=1, hidden_size=128, share_sigma_psi=False):
     super().__init__()
 
     # parameters:
-    self.sigma_psi = nn.Parameter(torch.randn(in_features, hidden_size, out_features))
+    self.sigma_psi = nn.Parameter(torch.randn(in_features, 1 if share_sigma_psi else hidden_size, out_features))
     self.chi = nn.Parameter(torch.randn(in_features, hidden_size, 1))
     self.sigma_eps = nn.Parameter(torch.randn(hidden_size, out_features))
     self.eta = nn.Parameter(torch.randn(hidden_size, out_features))
